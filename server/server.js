@@ -57,6 +57,7 @@ app.get("/classes/classStrength/:classStrength", async(req, res) => {
     var classes = await classModel.find({
         classStrength: {$gt : classStrength}
     })
+
     res.send(classes)
 })
 
