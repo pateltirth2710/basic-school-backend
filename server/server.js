@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const teacherModel = require('../db/teacher');
 const classModel = require('../db/classes');
+const classes = require('../db/classes');
 const app = express()
 const port = 3000
 
@@ -31,30 +32,49 @@ app.get("/management", (req,res)=>{
     res.send("Management")
 })
 
-//-----------------------------------------------CLASS--------------------------------------------------------------//
-app.get("/classes", (req, res) => {
-    res.send("All the classes of the school");
+//--------------------------------------ENDPOINTS FOR CLASS--------------------------------------------------------------//
+
+// Get all the classes of the school
+app.get("/classes", async (req, res) => {
+    const allClasses = await classModel.find({});
+    res.send(allClasses);
 })
 
+// Get details of a particular class.
+app.get("/classes/:class", async (req, res) => {
+
+    className = req.params['class'];
+    var classes = await classModel.find({
+        name : `${className}`
+    })
+    res.send(classes)    
+})
+
+// Get classes greater than given classStrength
+app.get("/classes/classStrength/:classStrength", async(req, res) => {
+
+    classStrength = req.params['classStrength'];
+    var classes = await classModel.find({
+        classStrength: {$gt : classStrength}
+    })
+    res.send(classes)
+})
+
+// Post request to create class for the school
 app.post("/classes/create", (req, res) => {
 
     newClassDetails = req.body;
-    var teacher = new teacherModel(newClassDetails['classTeacher'])
-    console.log(newClassDetails['name'])
-    console.log(newClassDetails['classStrength'])
-    console.log(teacher)
-
     newClass = new classModel({
         name : newClassDetails['name'],
         classStrength : newClassDetails['classStrength'],
-        classTeacher : teacher,
+        classTeacher : newClassDetails['classTeacher'],
     });
     
     newClass.save()
     res.end();
 })
 
-//---------------------------------------------TEACHERS ------------------------------------------------------------//
+//---------------------ENDPOINTS FOR TEACHERS ------------------------------------------------------------//
 
 // Get all the teachers of the school
 app.get("/teachers", async(req,res)=>{
@@ -71,7 +91,7 @@ app.get("/teachers/class/:class", async(req,res)=> {
     res.send(teachers);
 })
 
-// Get all teachers of a particular subject
+// Get all teachers teaching the given subject
 app.get("/teachers/subject/:subject", async (req,res)=> {
 
     subject = req.params.subject;
