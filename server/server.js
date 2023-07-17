@@ -2,10 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const teacherModel = require('../db/teacher');
 const classModel = require('../db/classes');
-const classes = require('../db/classes');
+const studentModel = require('../db/students');
+const student = require('../db/students');
+
 const app = express()
 const port = 3000
-
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
@@ -17,19 +18,41 @@ mongoose.connect('mongodb://127.0.0.1:27017/school', {useNewUrlParser: true, use
 .then((result)=>{console.log("Database has been connected");})
 .catch((err)=>{console.log("Error")})
 
+//------------------------------------------------- ENDPOINT FOR HOME PAGE--------------------------------------------------//
 app.get("/", (req,res)=>{
     console.log("Home Page")
     res.send("This is school management system")
 })
 
-app.get("/students", (req,res)=>{
-    console.log("Students of the school")
-    res.send("Students")
+//--------------------------------------ENDPOINTS FOR STUDENTS--------------------------------------------------------------//
+
+// Get students of the school
+app.get("/students", async (req,res)=>{
+    var students = await studentModel.find({});
+    res.send(students);
 })
 
-app.get("/management", (req,res)=>{
-    console.log("Management team of the school")
-    res.send("Management")
+// get Students of a particular class
+app.get("/students/class/:class", async (req, res) => {
+    let students = await studentModel.find({
+        class : `${req.params.class}`
+    })
+    res.send(students)
+})
+
+// Get students of a particular gender (male / female)
+app.get("/students/gender/:gender", async (req, res) => {
+    let students = await studentModel.find({
+        gender : `${req.params.gender}`
+    })
+    res.send(students);
+
+})
+
+app.post("/students/register", (req, res) => {
+    var student = new studentModel(req.body)
+    student.save();
+    res.end();
 })
 
 //--------------------------------------ENDPOINTS FOR CLASS--------------------------------------------------------------//
