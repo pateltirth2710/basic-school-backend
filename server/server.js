@@ -49,9 +49,24 @@ app.get("/students/gender/:gender", async (req, res) => {
 
 })
 
+// Register a new student
 app.post("/students/register", (req, res) => {
     var student = new studentModel(req.body)
     student.save();
+    res.end();
+})
+
+// Edit details of a student given class and roll number. (I am changing the roll number to a random value)
+app.put("/students/class/:class/rollnumber/:rollNumber", async (req, res)=> {
+
+    console.log(req.params);
+    console.log(req.body);
+    let student = await studentModel.find({
+        rollNumber : `${req.params.rollNumber}`,
+        class : `${req.params.class}`
+    })
+    student[0]['rollNumber'] = String(Math.floor(Math.random() * 10));
+    student[0].save();
     res.end();
 })
 
