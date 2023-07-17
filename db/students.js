@@ -7,7 +7,7 @@ const studentSchema = new Schema({
     required: true,
   },
   rollNumber : {
-    type: Number,
+    type: String,
     required : true,
     unique : true,
   },
