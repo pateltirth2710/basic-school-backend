@@ -169,3 +169,11 @@ app.post("/teacher/add", (req, res) => {
     teacher.save();
     res.end();
 });
+
+// delete request to delete a teacher from the database.
+app.delete("/teachers/unregister/:name", async (req, res)=>{
+    console.log("Teacher is to be deleted");
+    await teacherModel.deleteOne({ name: req.params.name})
+    res.end();
+})
+
